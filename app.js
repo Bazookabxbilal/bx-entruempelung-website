@@ -23,7 +23,7 @@
     if (activeTimer) window.clearTimeout(activeTimer);
     if (card.open) {
       document.querySelectorAll('.service-card[open]').forEach(other => { if (other !== card) other.open = false; });
-      serviceTimers.set(card, window.setTimeout(() => { card.open = false; }, 6500));
+      serviceTimers.set(card, window.setTimeout(() => { card.open = false; }, 5000));
     }
   }));
 
