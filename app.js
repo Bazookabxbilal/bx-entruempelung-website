@@ -20,13 +20,6 @@
   const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } }), { threshold: .12 }) : null;
   document.querySelectorAll('.reveal').forEach(el => observer ? observer.observe(el) : el.classList.add('visible'));
 
-  document.querySelector('[data-map] .map-button')?.addEventListener('click', () => {
-    const holder = document.querySelector('[data-map]');
-    const frame = document.createElement('iframe');
-    frame.title = 'Google Maps – Frankfurt am Main und Umgebung'; frame.loading = 'lazy'; frame.referrerPolicy = 'no-referrer-when-downgrade'; frame.allowFullscreen = true;
-    frame.src = 'https://www.google.com/maps?q=Frankfurt%20am%20Main&z=9&output=embed'; holder.replaceChildren(frame);
-  });
-
   const form = document.querySelector('#request-form');
   let action = 'whatsapp';
   form?.querySelectorAll('[data-submit]').forEach(button => button.addEventListener('click', () => { action = button.dataset.submit; }));
