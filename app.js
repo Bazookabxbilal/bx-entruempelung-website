@@ -1,96 +1,39 @@
 (() => {
   const menuButton = document.querySelector('.menu-toggle');
-  const nav = document.querySelector('.main-nav');
-  if (menuButton && nav) {
-    menuButton.addEventListener('click', () => {
-      const open = nav.classList.toggle('open');
-      menuButton.setAttribute('aria-expanded', String(open));
-      menuButton.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
-    });
-    nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-      nav.classList.remove('open');
-      menuButton.setAttribute('aria-expanded', 'false');
-    }));
-  }
+  const nav = document.querySelector('#site-nav');
+  const closeMenu = () => { nav?.classList.remove('open'); document.body.classList.remove('menu-open'); menuButton?.setAttribute('aria-expanded', 'false'); };
+  menuButton?.addEventListener('click', () => { const open = !nav.classList.contains('open'); nav.classList.toggle('open', open); document.body.classList.toggle('menu-open', open); menuButton.setAttribute('aria-expanded', String(open)); });
+  nav?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
 
-  const year = document.getElementById('year');
-  if (year) year.textContent = new Date().getFullYear();
+  document.querySelectorAll('.brand img').forEach(img => { const fail = () => img.closest('.brand')?.classList.add('image-missing'); img.addEventListener('error', fail); if (img.complete && !img.naturalWidth) fail(); });
+  document.querySelectorAll('.gallery-track img').forEach(img => { const figure = img.closest('figure'); const ok = () => figure?.classList.add('loaded'); const fail = () => { img.hidden = true; figure?.classList.remove('loaded'); }; img.addEventListener('load', ok); img.addEventListener('error', fail); if (img.complete) img.naturalWidth ? ok() : fail(); });
 
-  document.querySelectorAll('.track-cta').forEach(el => {
-    el.addEventListener('click', () => {
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: el.dataset.event || 'cta_click',
-        page_path: window.location.pathname,
-        cta_text: el.textContent.trim()
-      });
-    });
+  document.querySelectorAll('.marquee-track').forEach(track => { track.insertAdjacentHTML('beforeend', track.innerHTML); Array.from(track.children).slice(track.children.length / 2).forEach(el => el.setAttribute('aria-hidden', 'true')); });
+
+  const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } }), { threshold: .12 }) : null;
+  document.querySelectorAll('.reveal').forEach(el => observer ? observer.observe(el) : el.classList.add('visible'));
+
+  document.querySelector('[data-map] .map-button')?.addEventListener('click', () => {
+    const holder = document.querySelector('[data-map]');
+    const frame = document.createElement('iframe');
+    frame.title = 'Google Maps – Frankfurt am Main und Umgebung'; frame.loading = 'lazy'; frame.referrerPolicy = 'no-referrer-when-downgrade'; frame.allowFullscreen = true;
+    frame.src = 'https://www.google.com/maps?q=Frankfurt%20am%20Main&z=9&output=embed'; holder.replaceChildren(frame);
   });
 
-  const getLeadData = () => {
-    const name = document.getElementById('lead-name')?.value.trim() || '-';
-    const place = document.getElementById('lead-location')?.value.trim() || '-';
-    const floor = document.getElementById('lead-floor')?.value.trim() || '-';
-    const lift = document.getElementById('lead-lift')?.value || '-';
-    const parking = document.getElementById('lead-parking')?.value || '-';
-    const type = document.getElementById('lead-type')?.value || '-';
-    const message = document.getElementById('lead-message')?.value.trim() || '-';
-    return { name, place, floor, lift, parking, type, message };
-  };
-
-  const buildWhatsAppText = ({ name, place, floor, lift, parking, type, message }) => [
-    'Hallo liebes Team von BX Entrümpelung,',
-    '',
-    'ich würde mir gern ein unverbindliches Angebot einholen.',
-    '',
-    `Name: ${name}`,
-    `Ort / Stadtteil: ${place}`,
-    `Stockwerk: ${floor}`,
-    `Aufzug: ${lift}`,
-    `Parkmöglichkeit: ${parking}`,
-    `Objekt: ${type}`,
-    `Kurze Beschreibung: ${message}`,
-    '',
-    'Wenn vorhanden, sende ich Ihnen gern zusätzlich Fotos zu.'
-  ].join('\n');
-
-  const buildEmailBody = ({ name, place, floor, lift, parking, type, message }) => [
-    'Hallo liebes Team von BX Entrümpelung,',
-    '',
-    'ich würde mir gern ein unverbindliches Angebot einholen.',
-    '',
-    `Name: ${name}`,
-    `Ort / Stadtteil: ${place}`,
-    `Stockwerk: ${floor}`,
-    `Aufzug: ${lift}`,
-    `Parkmöglichkeit: ${parking}`,
-    `Objekt: ${type}`,
-    `Kurze Beschreibung: ${message}`,
-    '',
-    'Wenn vorhanden, kann ich Ihnen zusätzlich Fotos zusenden.',
-    '',
-    'Mit freundlichen Grüßen',
-    name !== '-' ? name : ''
-  ].join('\n');
-
-  const waButton = document.getElementById('send-whatsapp');
-  if (waButton) {
-    waButton.addEventListener('click', () => {
-      const text = buildWhatsAppText(getLeadData());
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: 'lead_form_whatsapp', page_path: window.location.pathname });
-      window.open(`https://wa.me/4915565783662?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
-    });
-  }
-
-  const mailButton = document.getElementById('send-email');
-  if (mailButton) {
-    mailButton.addEventListener('click', () => {
+  const form = document.querySelector('#request-form');
+  let action = 'whatsapp';
+  form?.querySelectorAll('[data-submit]').forEach(button => button.addEventListener('click', () => { action = button.dataset.submit; }));
+  form?.addEventListener('submit', event => {
+    event.preventDefault(); if (!form.reportValidity()) return;
+    const data = new FormData(form); const get = key => String(data.get(key) || '').trim();
+    if (action === 'email') {
       const subject = 'Anfrage unverbindliches Angebot – BX Entrümpelung';
-      const body = buildEmailBody(getLeadData());
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: 'lead_form_email', page_path: window.location.pathname });
+      const body = `Sehr geehrtes Team von BX Entrümpelung,\n\nich möchte gerne eine unverbindliche Einschätzung beziehungsweise ein Angebot für folgende Anfrage erhalten:\n\nName: ${get('name')}\nOrt / Stadtteil: ${get('location')}\nStockwerk: ${get('floor')}\nAufzug: ${get('elevator')}\nParkmöglichkeit: ${get('parking')}\nObjekt: ${get('object')}\nBeschreibung: ${get('description')}\n\nWenn erforderlich, kann ich Ihnen zusätzlich Fotos des Objekts zukommen lassen.\n\nMit freundlichen Grüßen\n${get('name')}`;
       window.location.href = `mailto:bx.entrumpelung@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-  }
+    } else {
+      const message = `Hallo liebes Team von BX Entrümpelung,\n\nich würde mir gern ein unverbindliches Angebot einholen.\n\nName: ${get('name')}\nOrt / Stadtteil: ${get('location')}\nStockwerk: ${get('floor')}\nAufzug: ${get('elevator')}\nParkmöglichkeit: ${get('parking')}\nObjekt: ${get('object')}\nKurze Beschreibung: ${get('description')}\n\nWenn vorhanden, sende ich Ihnen gern zusätzlich Fotos zu.`;
+      window.open(`https://wa.me/4915565783662?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    }
+  });
+  const year = document.querySelector('#year'); if (year) year.textContent = new Date().getFullYear();
 })();
