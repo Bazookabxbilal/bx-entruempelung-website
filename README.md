@@ -31,7 +31,7 @@ Danach `http://localhost:8000` öffnen. Die Dateien nicht nur per Doppelklick ö
 1. Dateien in das Repository `bx-entruempelung-website` übertragen.
 2. Unter **Settings → Pages** als Quelle **Deploy from a branch** wählen.
 3. Branch `main` und Ordner `/ (root)` auswählen.
-4. Nach dem ersten Deployment ist die Website unter `https://bazookabxbilal.github.io/bx-entruempelung-website/` erreichbar.
+4. Nach dem Deployment ist die Website über GitHub Pages und nach korrekter DNS-Konfiguration unter `https://bx-entruempelung.de/` erreichbar.
 
 Es sind keine Build-Schritte und keine Abhängigkeiten nötig.
 
@@ -49,10 +49,10 @@ Logo und Referenzbilder besitzen Fallbacks: Solange Dateien fehlen, bleibt das L
 
 ## Eigene Domain
 
-1. In GitHub unter **Settings → Pages → Custom domain** die Domain eintragen.
+1. Die Datei `CNAME` enthält bereits `bx-entruempelung.de`; GitHub Pages übernimmt diesen Domainnamen beim Deployment.
 2. Beim Domainanbieter die von GitHub dokumentierten DNS-Einträge setzen.
 3. Nach erfolgreicher Prüfung **Enforce HTTPS** aktivieren.
-4. Canonical-URL, Open-Graph-URL, JSON-LD, `robots.txt` und `sitemap.xml` von der GitHub-Pages-Adresse auf die eigene Domain aktualisieren.
+4. Canonical-URL, Open-Graph-URL, JSON-LD, `robots.txt` und `sitemap.xml` sind bereits auf `bx-entruempelung.de` eingestellt.
 
 ## Datenschutz-Hinweis
 

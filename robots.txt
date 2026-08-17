@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bazookabxbilal.github.io/bx-entruempelung-website/sitemap.xml
+Sitemap: https://bx-entruempelung.de/sitemap.xml

@@ -17,6 +17,16 @@
     if (img.complete) img.naturalWidth ? ok() : fail();
   });
 
+  const serviceTimers = new WeakMap();
+  document.querySelectorAll('.service-card').forEach(card => card.addEventListener('toggle', () => {
+    const activeTimer = serviceTimers.get(card);
+    if (activeTimer) window.clearTimeout(activeTimer);
+    if (card.open) {
+      document.querySelectorAll('.service-card[open]').forEach(other => { if (other !== card) other.open = false; });
+      serviceTimers.set(card, window.setTimeout(() => { card.open = false; }, 6500));
+    }
+  }));
+
   const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } }), { threshold: .12 }) : null;
   document.querySelectorAll('.reveal').forEach(el => observer ? observer.observe(el) : el.classList.add('visible'));
 
